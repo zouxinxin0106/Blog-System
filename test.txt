@@ -1,0 +1,113 @@
+# Blog System API Test Commands
+
+## 1. Health Check
+curl -X GET http://localhost:8080/health
+
+## 2. Register User
+curl -X POST http://localhost:8080/auth/register ^
+  -H "Content-Type: application/json" ^
+  -d "{\"name\":\"Test User\",\"email\":\"test@example.com\",\"password\":\"123456\"}"
+
+## 3. Login User
+curl -X POST http://localhost:8080/auth/login ^
+  -H "Content-Type: application/json" ^
+  -d "{\"email\":\"test@example.com\",\"password\":\"123456\"}"
+
+## 4. Get All Posts (Public)
+curl -X GET http://localhost:8080/posts
+
+## 5. Create Post (Protected)
+curl -X POST http://localhost:8080/posts ^
+  -H "Content-Type: application/json" ^
+  -H "Authorization: Bearer TOKEN" ^
+  -d "{\"title\":\"My First Post\",\"content\":\"This is my first blog post content.\"}"
+
+## 6. Get Single Post (Public)
+curl -X GET http://localhost:8080/posts/1
+
+## 7. Update Post (Protected)
+curl -X PUT http://localhost:8080/posts/1 ^
+  -H "Content-Type: application/json" ^
+  -H "Authorization: Bearer TOKEN" ^
+  -d "{\"title\":\"Updated Title\",\"content\":\"Updated content.\"}"
+
+## 8. Create Comment (Protected)
+curl -X POST http://localhost:8080/posts/1/comments ^
+  -H "Content-Type: application/json" ^
+  -H "Authorization: Bearer TOKEN" ^
+  -d "{\"content\":\"This is a test comment.\"}"
+
+## 9. Get Comments by Post (Public)
+curl -X GET http://localhost:8080/posts/1/comments
+
+## 10. Delete Comment (Protected)
+curl -X DELETE http://localhost:8080/comments/1 ^
+  -H "Authorization: Bearer TOKEN"
+
+## 11. Delete Post (Protected)
+curl -X DELETE http://localhost:8080/posts/1 ^
+  -H "Authorization: Bearer TOKEN"
+
+---
+
+## TEST RESULTS
+
+### 1. Health Check
+curl -X GET http://localhost:8080/health
+Result: {"status":"ok"}
+
+### 2. Register User
+curl -X POST http://localhost:8080/auth/register -H "Content-Type: application/json" -d "{\"name\":\"Test User\",\"email\":\"test@example.com\",\"password\":\"123456\"}"
+Result: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Nzk5OTUyMDYsImlhdCI6MTc3OTkwODgwNiwidXNlcl9pZCI6MX0.fHjW7b526zBUQOobyx4b6LgUu_6LKpVVyf0bSeIVcEc","user":{"id":1,"name":"Test User","email":"test@example.com","post_count":0}}
+
+### 3. Login User
+curl -X POST http://localhost:8080/auth/login -H "Content-Type: application/json" -d "{\"email\":\"test@example.com\",\"password\":\"123456\"}"
+Result: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Nzk5OTUyMjAsImlhdCI6MTc3OTkwODgyMCwidXNlcl9pZCI6MX0.kUVfEDLc0VLgZ8ScnC4U7MgAiRtkrErh69gVjBESoTs","user":{"id":1,"name":"Test User","email":"test@example.com","post_count":0}}
+
+### 4. Get All Posts (Public)
+curl -X GET http://localhost:8080/posts
+Result: []
+
+### 5. Create Post (Protected)
+curl -X POST http://localhost:8080/posts -H "Content-Type: application/json" -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Nzk5OTUyMjAsImlhdCI6MTc3OTkwODgyMCwidXNlcl9pZCI6MX0.kUVfEDLc0VLgZ8ScnC4U7MgAiRtkrErh69gVjBESoTs" -d "{\"title\":\"My First Post\",\"content\":\"This is my first blog post content.\"}"
+Result: {"id":1,"title":"My First Post","content":"This is my first blog post content.","user_id":1,"user":{"id":0,"name":"","email":"","post_count":0},"comment_status":"有评论"}
+
+### 6. Get Single Post (Public)
+curl -X GET http://localhost:8080/posts/1
+Result: {"id":1,"title":"My First Post","content":"This is my first blog post content.","user_id":1,"user":{"id":1,"name":"Test User","email":"test@example.com","post_count":1},"comment_status":"有评论"}
+
+### 7. Update Post (Protected)
+curl -X PUT http://localhost:8080/posts/1 -H "Content-Type: application/json" -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Nzk5OTUyMjAsImlhdCI6MTc3OTkwODgyMCwidXNlcl9pZCI6MX0.kUVfEDLc0VLgZ8ScnC4U7MgAiRtkrErh69gVjBESoTs" -d "{\"title\":\"Updated Title\",\"content\":\"Updated content.\"}"
+Result: {"id":1,"title":"Updated Title","content":"Updated content.","user_id":1,"user":{"id":0,"name":"","email":"","post_count":0},"comment_status":"有评论"}
+
+### 8. Create Comment (Protected)
+curl -X POST http://localhost:8080/posts/1/comments -H "Content-Type: application/json" -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Nzk5OTUyMjAsImlhdCI6MTc3OTkwODgyMCwidXNlcl9pZCI6MX0.kUVfEDLc0VLgZ8ScnC4U7MgAiRtkrErh69gVjBESoTs" -d "{\"content\":\"This is a test comment.\"}"
+Result: {"id":1,"content":"This is a test comment.","user_id":1,"user":{"id":0,"name":"","email":"","post_count":0},"post_id":1,"post":{"id":0,"title":"","content":"","user_id":0,"user":{"id":0,"name":"","email":"","post_count":0},"comment_status":""}}
+
+### 9. Get Comments by Post (Public)
+curl -X GET http://localhost:8080/posts/1/comments
+Result: [{"id":1,"content":"This is a test comment.","user_id":1,"user":{"id":1,"name":"Test User","email":"test@example.com","post_count":1},"post_id":1,"post":{"id":0,"title":"","content":"","user_id":0,"user":{"id":0,"name":"","email":"","post_count":0},"comment_status":""}}]
+
+### 10. Delete Comment (Protected)
+curl -X DELETE http://localhost:8080/comments/1 -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Nzk5OTUyMjAsImlhdCI6MTc3OTkwODgyMCwidXNlcl9pZCI6MX0.kUVfEDLc0VLgZ8ScnC4U7MgAiRtkrErh69gVjBESoTs"
+Result: {"message":"Comment deleted successfully"}
+
+### 11. Delete Post (Protected)
+curl -X DELETE http://localhost:8080/posts/1 -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Nzk5OTUyMjAsImlhdCI6MTc3OTkwODgyMCwidXNlcl9pZCI6MX0.kUVfEDLc0VLgZ8ScnC4U7MgAiRtkrErh69gVjBESoTs"
+Result: {"message":"Post deleted successfully"}
+
+---
+
+## Summary
+All 11 API endpoints tested successfully:
+- Health check: OK
+- User registration: OK
+- User login: OK
+- Get all posts: OK
+- Create post (auth required): OK
+- Get single post: OK
+- Update post (auth required): OK
+- Create comment (auth required): OK
+- Get comments by post: OK
+- Delete comment (auth required): OK
+- Delete post (auth required): OK

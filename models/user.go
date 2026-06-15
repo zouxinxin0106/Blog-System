@@ -7,6 +7,7 @@ type User struct {
 	ID        uint      `gorm:"primaryKey" json:"id"`
 	Name      string    `gorm:"size:100;not null" json:"name"`
 	Email     string    `gorm:"size:100;uniqueIndex;not null" json:"email"`
+	Password  string    `gorm:"size:255;not null" json:"-"`
 	PostCount uint      `gorm:"default:0" json:"post_count"`
 	// Struct fields or slices of structs are mapped to associations in GORM
 	// Association fields are not stored as table columns; GORM manages them through foreign keys
